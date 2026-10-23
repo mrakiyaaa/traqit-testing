@@ -26,5 +26,25 @@ export class LoginPage {
   async expectLoggedIn(): Promise<void> {
     await expect(this.page).not.toHaveURL(/\/login/, { timeout: 30_000 });
     await expect(this.emailInput).toBeHidden();
+
   }
+
+      /**
+   * The real proof you're logged out: try a protected page and get bounced.
+   * Change '/app' if your protected pages live somewhere else.
+   */
+  async expectLoggedOut(): Promise<void> {
+    await this.page.goto('/app');
+    await expect(this.page).toHaveURL(/\/login/);
+  }
+
+    /**
+   * Expect the email input to be invalid.
+   */
+  async expectEmailRejected(): Promise<void> {
+    const isValid = await this.emailInput.evaluate((el) => (el as HTMLInputElement).validity.valid);
+    expect(isValid).toBe(false);
+    await expect(this.page).toHaveURL(/\/login/);
+  }
+  
 }
